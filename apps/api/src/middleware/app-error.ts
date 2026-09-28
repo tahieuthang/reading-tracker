@@ -9,6 +9,7 @@ export class AppError extends Error {
     public readonly code: string,
     message: string,
     public readonly details: ErrorDetail[] = [],
+    public readonly headers: Record<string, string> = {},
   ) {
     super(message);
     this.name = "AppError";

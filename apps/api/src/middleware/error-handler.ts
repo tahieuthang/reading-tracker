@@ -36,6 +36,12 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, _nex
     req.log?.warn({ code, requestId: req.id }, "Request rejected");
   }
 
+  if (appError) {
+    for (const [name, value] of Object.entries(appError.headers)) {
+      res.setHeader(name, value);
+    }
+  }
+
   res.status(statusCode).json({
     error: {
       code,

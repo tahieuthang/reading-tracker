@@ -1,6 +1,6 @@
 # Reading Tracker
 
-Single-shelf reading tracker. Implementation is delivered in reviewed stages; see [PLAN.md](./PLAN.md), [the Phase 0 review](./docs/PHASE-0-REVIEW.md), and [the Phase 1 review](./docs/PHASE-1-REVIEW.md).
+Single-shelf reading tracker. Implementation is delivered in reviewed stages; see [PLAN.md](./PLAN.md), [the Phase 0 review](./docs/PHASE-0-REVIEW.md), [the Phase 1 review](./docs/PHASE-1-REVIEW.md), and [the Phase 2 review](./docs/PHASE-2-REVIEW.md).
 
 ## Prerequisites
 
