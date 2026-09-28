@@ -6,6 +6,7 @@ import { prisma } from "./lib/prisma.js";
 import { AppError } from "./middleware/app-error.js";
 import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { booksRouter, coversRouter } from "./modules/books/books-routes.js";
+import { shelfRouter } from "./modules/shelf/shelf-routes.js";
 
 export const app = express();
 
@@ -24,6 +25,7 @@ app.use(
 app.use(express.json({ limit: "16kb" }));
 app.use("/api/books", booksRouter);
 app.use("/api/covers", coversRouter);
+app.use("/api/shelf", shelfRouter);
 
 app.get("/api/health", async (_req, res, next) => {
   try {

@@ -1,5 +1,5 @@
-import { prisma } from "../../lib/prisma.js";
 import { AppError } from "../../middleware/app-error.js";
+import { shelfRepository } from "../shelf/shelf-repository.js";
 import { openLibraryClient } from "./open-library-client.js";
 import type {
   BookDetail,
@@ -79,10 +79,7 @@ async function attachShelfFlags(items: BookSearchItem[]): Promise<BookSearchItem
   const workIds = items.map((item) => item.workId);
   if (workIds.length === 0) return items;
 
-  const shelfItems = await prisma.shelfBook.findMany({
-    where: { workId: { in: workIds } },
-    select: { workId: true, deletedAt: true },
-  });
+  const shelfItems = await shelfRepository.findStatesByWorkIds(workIds);
   const byWorkId = new Map(shelfItems.map((item) => [item.workId, item.deletedAt]));
 
   return items.map((item) => {
@@ -163,10 +160,7 @@ export async function getBookDetail(workId: string): Promise<BookDetail> {
       .find((year) => year !== null) ??
     null;
 
-  const shelfItem = await prisma.shelfBook.findUnique({
-    where: { workId },
-    select: { deletedAt: true },
-  });
+  const shelfItem = await shelfRepository.findByWorkId(workId);
   const exists = shelfItem !== null;
 
   return {

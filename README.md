@@ -1,6 +1,6 @@
 # Reading Tracker
 
-Single-shelf reading tracker. Implementation is delivered in reviewed stages; see [PLAN.md](./PLAN.md), [the Phase 0 review](./docs/PHASE-0-REVIEW.md), [the Phase 1 review](./docs/PHASE-1-REVIEW.md), and [the Phase 2 review](./docs/PHASE-2-REVIEW.md).
+Single-shelf reading tracker. Implementation is delivered in reviewed stages; see [PLAN.md](./PLAN.md), [the Phase 0 review](./docs/PHASE-0-REVIEW.md), [the Phase 1 review](./docs/PHASE-1-REVIEW.md), [the Phase 2 review](./docs/PHASE-2-REVIEW.md), and [the Phase 3 review](./docs/PHASE-3-REVIEW.md).
 
 ## Prerequisites
 
@@ -24,6 +24,8 @@ Single-shelf reading tracker. Implementation is delivered in reviewed stages; se
 Use `npm run db:migrate -- --name <migration-name>` only when authoring a schema change locally; Prisma Migrate Dev needs a database account that can create its shadow database.
 
 6. Start the API and Vue dev server with `npm run dev`.
+
+Run the backend shelf-rule tests with `npm test`.
 
 The Vite server proxies `/api` to the API on port 3000. The initial API route is `GET /api/health`.
 
