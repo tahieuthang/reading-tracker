@@ -1,6 +1,6 @@
 # Reading Tracker
 
-Single-shelf reading tracker. Implementation is delivered in reviewed stages; see [PLAN.md](./PLAN.md), [the Phase 0 review](./docs/PHASE-0-REVIEW.md), [the Phase 1 review](./docs/PHASE-1-REVIEW.md), [the Phase 2 review](./docs/PHASE-2-REVIEW.md), and [the Phase 3 review](./docs/PHASE-3-REVIEW.md).
+Single-shelf reading tracker. Implementation is delivered in reviewed stages; see [PLAN.md](./PLAN.md), [the Phase 0 review](./docs/PHASE-0-REVIEW.md), [the Phase 1 review](./docs/PHASE-1-REVIEW.md), [the Phase 2 review](./docs/PHASE-2-REVIEW.md), [the Phase 3 review](./docs/PHASE-3-REVIEW.md), and [the Phase 4 review](./docs/PHASE-4-REVIEW.md).
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ Use `npm run db:migrate -- --name <migration-name>` only when authoring a schema
 
 Run the backend shelf-rule tests with `npm test`.
 
-The Vite server proxies `/api` to the API on port 3000. The initial API route is `GET /api/health`.
+The Vite server proxies `/api` to the API on port 3000. Set `VITE_API_PROXY_TARGET` in the frontend environment to use another local API address. The initial API route is `GET /api/health`.
 
 ## Local database defaults
 
