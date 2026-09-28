@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum ShelfStatus {
+  WANT_TO_READ
+  READING
+  READ
+}
+
+enum PageCountSource {
+  EDITION
+  MANUAL
+}
+
+model ShelfBook {
+  id               String           @id @default(uuid()) @db.Char(36)
+  workId           String           @unique(map: "shelf_books_work_id_key") @map("work_id") @db.VarChar(32)
+  editionId        String?          @map("edition_id") @db.VarChar(32)
+  title            String           @db.VarChar(512)
+  authors          Json
+  coverId          Int?             @map("cover_id")
+  firstPublishYear Int?             @map("first_publish_year")
+  description      String?          @db.Text
+  subjects         Json?
+  totalPages       Int?             @map("total_pages") @db.UnsignedInt
+  pageCountSource  PageCountSource? @map("page_count_source")
+  currentPage      Int              @default(0) @map("current_page") @db.UnsignedInt
+  status           ShelfStatus      @default(WANT_TO_READ)
+  rating           Int?             @db.UnsignedTinyInt
+  note             String?          @db.VarChar(1000)
+  startedAt        DateTime?        @map("started_at") @db.DateTime(3)
+  finishedAt       DateTime?        @map("finished_at") @db.DateTime(3)
+  deletedAt        DateTime?        @map("deleted_at") @db.DateTime(3)
+  createdAt        DateTime         @default(now()) @map("created_at") @db.DateTime(3)
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.DateTime(3)
+
+  @@index([status, deletedAt], map: "shelf_books_status_deleted_at_idx")
+  @@index([deletedAt], map: "shelf_books_deleted_at_idx")
+  @@map("shelf_books")
+}
+
