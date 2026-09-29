@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useRouter } from "vue-router";
+import AppAlert from "../components/AppAlert.vue";
 import ShelfBookCard from "../components/ShelfBookCard.vue";
 import { api, statusLabels, statusOptions, type ShelfBook, type ShelfStatus } from "../lib/api";
 
@@ -155,16 +156,7 @@ function remove(book: ShelfBook) {
       </div>
     </div>
 
-    <div
-      v-if="notice"
-      class="mt-4 flex items-start justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-950"
-      role="status"
-    >
-      <span>{{ notice }}</span
-      ><button class="text-lg leading-none" aria-label="Đóng thông báo" @click="notice = ''">
-        ×
-      </button>
-    </div>
+    <AppAlert title="Thông báo tủ sách" :message="notice" @close="notice = ''" />
 
     <div v-if="shelfPending" class="mt-5 space-y-4">
       <div
