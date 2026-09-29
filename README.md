@@ -29,6 +29,8 @@ Run the backend shelf-rule tests with `npm test`.
 
 The Vite server proxies `/api` to the API on port 3000. Set `VITE_API_PROXY_TARGET` in the frontend environment to use another local API address. The initial API route is `GET /api/health`.
 
+Production Docker, Nginx, HTTPS, migration, and database backup/restore instructions are in [deploy/README.md](./deploy/README.md).
+
 ## Local database defaults
 
 The committed `.env.example` uses local-only development credentials. Replace them before exposing any service outside your machine.

@@ -40,7 +40,7 @@ defineEmits<{ add: [workId: string] }>();
         </span>
         <button
           v-else
-          class="button-secondary w-full"
+          class="button-secondary w-full !cursor-pointer"
           :disabled="adding"
           @click="$emit('add', book.workId)"
         >

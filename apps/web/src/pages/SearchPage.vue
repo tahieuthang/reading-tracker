@@ -126,7 +126,7 @@ function goToPage(target: number) {
             placeholder="Tên sách hoặc tác giả…"
           />
           <button
-            class="button-primary justify-center px-6"
+            class="button-primary justify-center px-6 !cursor-pointer"
             type="submit"
             :disabled="keyword.trim().length < 2 && draft.trim().length < 2"
           >
@@ -236,7 +236,7 @@ function goToPage(target: number) {
 
       <div v-if="searchData && totalPages > 1" class="mt-8 flex items-center justify-center gap-3">
         <button
-          class="button-secondary"
+          class="button-secondary cursor-pointer"
           :disabled="page <= 1 || searchFetching"
           @click="goToPage(page - 1)"
         >
@@ -244,7 +244,7 @@ function goToPage(target: number) {
         </button>
         <span class="text-sm tabular-nums text-stone-600">{{ page }} / {{ totalPages }}</span>
         <button
-          class="button-secondary"
+          class="button-secondary cursor-pointer"
           :disabled="page >= totalPages || searchFetching"
           @click="goToPage(page + 1)"
         >

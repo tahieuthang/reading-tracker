@@ -1,0 +1,11 @@
+.git
+.codegraph
+node_modules
+**/node_modules
+**/dist
+**/src/generated
+coverage
+**/.env
+**/.env.*
+*.log
+*.tsbuildinfo
