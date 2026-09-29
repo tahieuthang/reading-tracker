@@ -26,6 +26,32 @@ test("allows jumping directly to another valid page", () => {
   assert.equal(update.startedAt, startedAt);
 });
 
+test("automatically starts reading when a want-to-read book advances to a partial page", () => {
+  const update = buildShelfUpdate(
+    state({ status: "WANT_TO_READ", currentPage: 0, startedAt: null }),
+    { currentPage: 5 },
+    now,
+  );
+
+  assert.equal(update.currentPage, 5);
+  assert.equal(update.status, "READING");
+  assert.equal(update.startedAt, now);
+  assert.equal(update.finishedAt, null);
+});
+
+test("automatically completes a want-to-read book when it advances to its last page", () => {
+  const update = buildShelfUpdate(
+    state({ status: "WANT_TO_READ", currentPage: 0, startedAt: null }),
+    { currentPage: 100 },
+    now,
+  );
+
+  assert.equal(update.currentPage, 100);
+  assert.equal(update.status, "READ");
+  assert.equal(update.startedAt, null);
+  assert.equal(update.finishedAt, now);
+});
+
 test("automatically marks a book read when current page reaches total pages", () => {
   const update = buildShelfUpdate(state(), { currentPage: 100 }, now);
 
@@ -105,6 +131,61 @@ test("moving a book back to want-to-read resets progress dates but preserves oth
   assert.equal(update.finishedAt, null);
   assert.equal(update.rating, 4);
   assert.equal(update.note, "Reread later");
+});
+
+test("rejects moving an in-progress book back to want-to-read", () => {
+  assert.throws(
+    () => buildShelfUpdate(state(), { status: "WANT_TO_READ" }, now),
+    (error: unknown) =>
+      error instanceof AppError && error.code === "READING_PROGRESS_CANNOT_BE_RESET",
+  );
+});
+
+test("allows moving an in-progress book back to want-to-read when progress is reset to zero", () => {
+  const update = buildShelfUpdate(state(), { status: "WANT_TO_READ", currentPage: 0 }, now);
+
+  assert.equal(update.status, "WANT_TO_READ");
+  assert.equal(update.currentPage, 0);
+  assert.equal(update.startedAt, null);
+  assert.equal(update.finishedAt, null);
+});
+
+test("automatically moves an in-progress book to want-to-read when current page is reset to zero", () => {
+  const update = buildShelfUpdate(state(), { currentPage: 0 }, now);
+
+  assert.equal(update.status, "WANT_TO_READ");
+  assert.equal(update.currentPage, 0);
+  assert.equal(update.startedAt, null);
+  assert.equal(update.finishedAt, null);
+});
+
+test("rejects changing an edition page count from Open Library", () => {
+  assert.throws(
+    () => buildShelfUpdate(state({ pageCountSource: "EDITION" }), { totalPages: 120 }, now),
+    (error: unknown) => error instanceof AppError && error.code === "PAGE_COUNT_LOCKED",
+  );
+});
+
+test("allows replacing a zero page count with a manually entered count", () => {
+  const update = buildShelfUpdate(
+    state({ totalPages: 0, pageCountSource: null }),
+    { totalPages: 120 },
+    now,
+  );
+
+  assert.equal(update.totalPages, 120);
+  assert.equal(update.pageCountSource, "MANUAL");
+});
+
+test("normalizes a legacy zero page count to unknown when updating another field", () => {
+  const update = buildShelfUpdate(
+    state({ totalPages: 0, pageCountSource: "EDITION" }),
+    { note: "Need to confirm page count" },
+    now,
+  );
+
+  assert.equal(update.totalPages, null);
+  assert.equal(update.pageCountSource, null);
 });
 
 test("initial states assign dates and page counts consistently", () => {

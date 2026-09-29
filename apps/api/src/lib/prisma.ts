@@ -10,6 +10,7 @@ const adapter = new PrismaMariaDb({
   user: decodeURIComponent(databaseUrl.username),
   password: decodeURIComponent(databaseUrl.password),
   database: databaseUrl.pathname.slice(1),
+  allowPublicKeyRetrieval: true,
   connectionLimit: 5,
 });
 

@@ -22,6 +22,9 @@ function stringArray(value: unknown): string[] {
 }
 
 function toShelfBookDto(book: ShelfBook) {
+  const totalPages = book.totalPages !== null && book.totalPages > 0 ? book.totalPages : null;
+  const pageCountSource = totalPages === null ? null : book.pageCountSource;
+
   return {
     id: book.id,
     workId: book.workId,
@@ -33,11 +36,10 @@ function toShelfBookDto(book: ShelfBook) {
     firstPublishYear: book.firstPublishYear,
     description: book.description,
     subjects: stringArray(book.subjects),
-    totalPages: book.totalPages,
-    pageCountSource: book.pageCountSource,
+    totalPages,
+    pageCountSource,
     currentPage: book.currentPage,
-    progressPercent:
-      book.totalPages === null ? null : Math.round((book.currentPage / book.totalPages) * 100),
+    progressPercent: totalPages === null ? null : Math.round((book.currentPage / totalPages) * 100),
     status: book.status,
     rating: book.rating,
     note: book.note,
@@ -87,6 +89,25 @@ export async function addShelfBook(input: AddShelfBookInput) {
       "EDITION_NOT_AVAILABLE",
       "Ấn bản đã chọn không thuộc danh sách ấn bản của tác phẩm này.",
       [{ field: "editionId", message: "Chọn một ấn bản trong danh sách chi tiết sách." }],
+    );
+  }
+
+  if (
+    input.totalPages !== undefined &&
+    input.totalPages !== null &&
+    selectedEdition?.numberOfPages !== null &&
+    selectedEdition?.numberOfPages !== undefined
+  ) {
+    throw new AppError(
+      422,
+      "PAGE_COUNT_LOCKED",
+      "Tổng số trang của ấn bản lấy từ Open Library không thể chỉnh sửa.",
+      [
+        {
+          field: "totalPages",
+          message: "Không gửi totalPages khi ấn bản đã có số trang từ Open Library.",
+        },
+      ],
     );
   }
 

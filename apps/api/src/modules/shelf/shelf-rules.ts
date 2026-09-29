@@ -4,6 +4,7 @@ import { AppError } from "../../middleware/app-error.js";
 export interface ShelfState {
   status: ShelfStatus;
   totalPages: number | null;
+  pageCountSource?: PageCountSource | null;
   currentPage: number;
   startedAt: Date | null;
   finishedAt: Date | null;
@@ -55,12 +56,40 @@ function readingPageRequired(): AppError {
   );
 }
 
+function readingProgressCannotBeReset(): AppError {
+  return new AppError(
+    422,
+    "READING_PROGRESS_CANNOT_BE_RESET",
+    "Sách đang đọc dở không thể chuyển về Muốn đọc. Hãy tiếp tục cập nhật tiến độ hoặc đặt trang hiện tại về 0 trước.",
+    [{ field: "status", message: "Không thể chuyển về Muốn đọc khi tiến độ đang lớn hơn 0." }],
+  );
+}
+
+function pageCountLockedError(): AppError {
+  return new AppError(422, "PAGE_COUNT_LOCKED", "Tổng số trang của sách này không thể chỉnh sửa.", [
+    {
+      field: "totalPages",
+      message: "Số trang của sách này đang được khóa.",
+    },
+  ]);
+}
+
 export function buildShelfUpdate(
   current: ShelfState,
   patch: ShelfPatch,
   now = new Date(),
 ): ShelfUpdate {
-  const totalPages = patch.totalPages !== undefined ? patch.totalPages : current.totalPages;
+  if (
+    patch.totalPages !== undefined &&
+    current.pageCountSource === "EDITION" &&
+    current.totalPages !== 0
+  ) {
+    throw pageCountLockedError();
+  }
+
+  const normalizedCurrentTotalPages = current.totalPages === 0 ? null : current.totalPages;
+  const totalPages =
+    patch.totalPages !== undefined ? patch.totalPages : normalizedCurrentTotalPages;
   let currentPage = patch.currentPage ?? current.currentPage;
   let status = patch.status ?? current.status;
   let startedAt = current.startedAt;
@@ -76,11 +105,25 @@ export function buildShelfUpdate(
 
   if (patch.totalPages !== undefined) {
     update.pageCountSource = totalPages === null ? null : "MANUAL";
+  } else if (current.totalPages === 0) {
+    update.pageCountSource = null;
   }
   if (patch.rating !== undefined) update.rating = patch.rating;
   if (patch.note !== undefined) update.note = patch.note;
 
-  if (patch.status === "WANT_TO_READ") {
+  if (
+    patch.status === "WANT_TO_READ" &&
+    current.status === "READING" &&
+    currentPage > 0 &&
+    (totalPages === null || currentPage < totalPages)
+  ) {
+    throw readingProgressCannotBeReset();
+  }
+
+  if (
+    patch.currentPage === 0 ||
+    (patch.status === "WANT_TO_READ" && (current.status === "READ" || currentPage === 0))
+  ) {
     return {
       ...update,
       status: "WANT_TO_READ",
@@ -101,7 +144,13 @@ export function buildShelfUpdate(
     status = "READ";
   }
 
-  if (totalPages === null && currentPage > 0) throw pageCountRequired();
+  if (
+    totalPages === null &&
+    currentPage > 0 &&
+    (patch.currentPage !== undefined || patch.totalPages === null)
+  ) {
+    throw pageCountRequired();
+  }
   if (totalPages !== null && currentPage > totalPages)
     throw pageOutOfRange(currentPage, totalPages);
 
@@ -117,6 +166,10 @@ export function buildShelfUpdate(
   } else if (totalPages !== null && currentPage === totalPages) {
     status = "READ";
     if (current.status !== "READ" || current.finishedAt === null) finishedAt = now;
+  } else if (currentPage > 0 && patch.currentPage !== undefined) {
+    status = "READING";
+    if (startedAt === null) startedAt = now;
+    finishedAt = null;
   } else if (
     current.status === "READ" &&
     (patch.currentPage !== undefined || patch.totalPages !== undefined)
