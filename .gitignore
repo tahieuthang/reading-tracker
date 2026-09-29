@@ -10,3 +10,7 @@ apps/api/src/generated/
 .DS_Store
 /backups/
 
+/PLAN.md
+/docs/
+/deploy/README.md
+
