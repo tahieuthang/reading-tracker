@@ -2,10 +2,9 @@ import { randomUUID } from "node:crypto";
 import express from "express";
 import { pinoHttp } from "pino-http";
 import { logger } from "./lib/logger.js";
-import { prisma } from "./lib/prisma.js";
-import { AppError } from "./middleware/app-error.js";
 import { errorHandler, notFoundHandler } from "./middleware/error-handler.js";
 import { booksRouter, coversRouter } from "./modules/books/books-routes.js";
+import { healthRouter } from "./modules/health/health-routes.js";
 import { shelfRouter } from "./modules/shelf/shelf-routes.js";
 
 export const app = express();
@@ -26,20 +25,7 @@ app.use(express.json({ limit: "16kb" }));
 app.use("/api/books", booksRouter);
 app.use("/api/covers", coversRouter);
 app.use("/api/shelf", shelfRouter);
-
-app.get("/api/health", async (_req, res, next) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.status(200).json({
-      data: {
-        status: "ok",
-        database: "ok",
-      },
-    });
-  } catch {
-    next(new AppError(503, "DATABASE_UNAVAILABLE", "Cơ sở dữ liệu hiện không khả dụng."));
-  }
-});
+app.use("/api/health", healthRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

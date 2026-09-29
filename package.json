@@ -15,7 +15,9 @@
     "dev:web": "npm run dev --workspace @reading-tracker/web",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "test": "npm run test --workspace @reading-tracker/api",
+    "test": "npm run test --workspaces --if-present",
+    "test:integration": "npm run test:integration --workspace @reading-tracker/api",
+    "test:e2e": "playwright test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
     "concurrently": "^9.2.1",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.1.8",

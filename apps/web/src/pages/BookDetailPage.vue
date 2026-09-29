@@ -129,7 +129,6 @@ const pageChoices = computed(() =>
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p class="section-eyebrow">Lưu vào tủ sách</p>
-                <h2 class="mt-1 font-serif text-xl">Bạn muốn bắt đầu ở đâu?</h2>
               </div>
               <span
                 v-if="book.hasArchivedProgress"
@@ -190,7 +189,7 @@ const pageChoices = computed(() =>
               </button>
             </div>
             <button
-              class="button-primary mt-5 w-full justify-center"
+              class="button-primary mt-5 w-full justify-center cursor-pointer"
               :disabled="
                 adding ||
                 (useManualPages &&

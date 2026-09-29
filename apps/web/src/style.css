@@ -1,4 +1,9 @@
+@import "@fontsource-variable/noto-serif/wght.css";
 @import "tailwindcss";
+
+@theme {
+  --font-serif: "Noto Serif Variable", Georgia, Cambria, "Times New Roman", serif;
+}
 
 :root {
   font-family:

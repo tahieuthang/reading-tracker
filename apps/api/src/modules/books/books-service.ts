@@ -9,7 +9,6 @@ import type {
   OpenLibrarySearchDocument,
 } from "./types.js";
 
-const WORK_ID_PATTERN = /^OL\d+W$/;
 const EDITION_ID_PATTERN = /^OL\d+M$/;
 const AUTHOR_ID_PATTERN = /^OL\d+A$/;
 
@@ -187,5 +186,3 @@ export async function getBookDetail(workId: string): Promise<BookDetail> {
 export async function getBookCover(coverId: number) {
   return openLibraryClient.getCover(coverId);
 }
-
-export const openLibraryWorkIdPattern = WORK_ID_PATTERN;

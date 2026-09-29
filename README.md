@@ -25,7 +25,44 @@ Use `npm run db:migrate -- --name <migration-name>` only when authoring a schema
 
 6. Start the API and Vue dev server with `npm run dev`.
 
-Run the backend shelf-rule tests with `npm test`.
+## Automated checks
+
+Run the API unit/contract tests and Vue component tests with:
+
+```powershell
+npm test
+```
+
+Run the browser flow (search, add, finish, remove, and verify cover requests stay behind `/api`) with:
+
+```powershell
+npx playwright install chromium
+npm run test:e2e
+```
+
+Run the API + MySQL integration tests only against the isolated database from `compose.test.yaml`:
+
+```powershell
+docker compose -f compose.test.yaml up -d --wait
+$env:TEST_DATABASE_URL = "mysql://reader_test:reader_test_only@127.0.0.1:33316/reading_tracker_test"
+$env:DATABASE_URL = $env:TEST_DATABASE_URL
+npm run db:migrate:deploy
+npm run test:integration
+Remove-Item Env:TEST_DATABASE_URL
+Remove-Item Env:DATABASE_URL
+docker compose -f compose.test.yaml down
+```
+
+The integration suite refuses any database name other than `reading_tracker_test` and is skipped when `TEST_DATABASE_URL` is unset. The test Compose file uses its own local-only credentials and named volume; it does not reuse the development database.
+
+Run the delivery gates with:
+
+```powershell
+npm run typecheck
+npm run lint
+npm run build
+npm run format:check
+```
 
 The Vite server proxies `/api` to the API on port 3000. Set `VITE_API_PROXY_TARGET` in the frontend environment to use another local API address. The initial API route is `GET /api/health`.
 

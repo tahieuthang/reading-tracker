@@ -1,0 +1,25 @@
+name: reading-tracker-automated-test
+
+services:
+  mysql-test:
+    image: mysql:8.4
+    restart: "no"
+    environment:
+      MYSQL_DATABASE: reading_tracker_test
+      MYSQL_USER: reader_test
+      MYSQL_PASSWORD: reader_test_only
+      MYSQL_ROOT_PASSWORD: root_test_only
+    ports:
+      - "127.0.0.1:33316:3306"
+    volumes:
+      - test_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=127.0.0.1", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+volumes:
+  test_mysql_data:
+    name: reading-tracker-automated-test-mysql-data
