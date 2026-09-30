@@ -10,16 +10,13 @@ A small personal library for discovering books through [Open Library](https://op
 
 ![Reading Tracker personal bookshelf with reading statistics and progress controls](./screenshots/reading-tracker-shelf.png)
 
-> The application UI in the screenshot is currently in Vietnamese.
-
 ## Features
 
 - Search Open Library by title or author, browse paginated results, and view book details, editions, covers, publication year, subjects, and page counts when available.
 - Add a work to the personal shelf with an initial status: **Want to read**, **Reading**, or **Read**.
 - Track the current page, progress percentage, rating, and a short note; filter the shelf by status and view reading statistics.
 - Move reading status according to progress rules, including marking a book as read when the current page reaches its total page count.
-- Keep shelf metadata as a snapshot so the shelf remains usable without fetching every book field again. Removing a book is a soft delete; adding it again restores its saved progress.
-- Proxy book covers through the backend so the frontend does not call Open Library directly.
+- Removing a book is a soft delete; adding it again restores its saved progress.
 
 ## Tech stack
 
@@ -28,7 +25,7 @@ A small personal library for discovering books through [Open Library](https://op
 | Frontend         | Vue 3, TypeScript, Vue Router, TanStack Vue Query, Tailwind CSS 4, Vite |
 | Backend          | Node.js 22, TypeScript, Express 5, Zod, Pino, `express-rate-limit`      |
 | Database         | MySQL 8.4, Prisma 7, Prisma MariaDB adapter                             |
-| Tests            | Vitest, Vue Test Utils, jsdom, Node.js test runner, Playwright          |
+| Tests            | Vitest, Vue Test Utils, Node.js test runner, Playwright                 |
 | Deployment       | Docker Compose, Nginx, PM2 Runtime, Certbot / Let's Encrypt             |
 | External catalog | Open Library Search, Works, Editions, Authors, and Covers APIs          |
 
@@ -187,16 +184,22 @@ The production setup targets a Linux VPS and is deployed manually with Docker Co
 
 ### Initial deployment outline
 
-1. Install Docker Engine and the Docker Compose plugin on the VPS. Point the application's DNS A record to the VPS and allow inbound TCP ports 80 and 443. Reserve AAAA records for a correctly configured IPv6 VPS.
-2. Clone the repository and create the production environment file:
+1. From your local machine, connect to the VPS over SSH using the login user and IP address provided by your VPS host. Use the SSH key configured for the server if required:
+
+   ```sh
+   ssh <username>@<vps-ip>
+   ```
+
+2. Install Docker Engine and the Docker Compose plugin on the VPS. Point the application's DNS A record to the VPS and allow inbound TCP ports 80 and 443. Reserve AAAA records for a correctly configured IPv6 VPS.
+3. Clone the repository and create the production environment file:
 
    ```sh
    cp deploy/production.env.example .env.production
    chmod 600 .env.production
    ```
 
-3. Set `DOMAIN`, `LETSENCRYPT_EMAIL`, unique MySQL passwords, `DATABASE_URL`, and `OPEN_LIBRARY_USER_AGENT`. The database URL must use `db:3306` as its host and port; percent-encode reserved characters in its username or password. Keep MySQL off public ports.
-4. Start MySQL, issue the initial certificate while port 80 is available, then build and start the application:
+4. Set `DOMAIN`, `LETSENCRYPT_EMAIL`, unique MySQL passwords, `DATABASE_URL`, and `OPEN_LIBRARY_USER_AGENT`. The database URL must use `db:3306` as its host and port; percent-encode reserved characters in its username or password. Keep MySQL off public ports.
+5. Start MySQL, issue the initial certificate while port 80 is available, then build and start the application:
 
    ```sh
    docker compose --env-file .env.production -f compose.prod.yaml up -d db
@@ -204,7 +207,7 @@ The production setup targets a Linux VPS and is deployed manually with Docker Co
    docker compose --env-file .env.production -f compose.prod.yaml up -d --build
    ```
 
-5. Check `https://<your-domain>/api/health` for HTTP 200 and open the site over HTTPS.
+6. Check `https://<your-domain>/api/health` for HTTP 200 and open the site over HTTPS.
 
 For later releases, pull the intended Git revision, build the `migrate`, `api`, and `web` images, then recreate services with Compose. The API waits for the migration job to finish successfully. Certificate renewal and MySQL backups need scheduled VPS jobs; the repository does not currently install those schedules automatically.
 
@@ -222,4 +225,3 @@ For later releases, pull the intended Git revision, build the `migrate`, `api`, 
 - Add CI to run typecheck, lint, builds, automated tests, and a staging deployment on each change.
 - Schedule certificate renewal and encrypted off-site database backups, with tested restore procedures.
 - Add monitoring and alerting for API errors, database health, and Open Library failures; consider caching catalog responses to reduce dependence on upstream availability.
-- Add a staging smoke test and broader browser coverage for detail, validation, and shelf editing flows.
