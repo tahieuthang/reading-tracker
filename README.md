@@ -25,7 +25,7 @@ A small personal library for discovering books through [Open Library](https://op
 | Frontend         | Vue 3, TypeScript, Vue Router, TanStack Vue Query, Tailwind CSS 4, Vite |
 | Backend          | Node.js 22, TypeScript, Express 5, Zod, Pino, `express-rate-limit`      |
 | Database         | MySQL 8.4, Prisma 7, Prisma MariaDB adapter                             |
-| Tests            | Vitest, Vue Test Utils, Node.js test runner, Playwright                 |
+| Tests            | Node.js test runner                                                     |
 | Deployment       | Docker Compose, Nginx, PM2 Runtime, Certbot / Let's Encrypt             |
 | External catalog | Open Library Search, Works, Editions, Authors, and Covers APIs          |
 
@@ -141,17 +141,10 @@ Shelf status values are `WANT_TO_READ`, `READING`, and `READ`. Page counts and p
 
 ## Automated checks
 
-Run API unit/contract tests and frontend component tests:
+Run the API unit/contract tests included in the repository:
 
 ```powershell
 npm test
-```
-
-Run the browser flow (search, add, finish, remove, and verify that cover requests stay behind `/api`):
-
-```powershell
-npx playwright install chromium
-npm run test:e2e
 ```
 
 Run API + MySQL integration tests only against the isolated database in `compose.test.yaml`:
@@ -222,6 +215,6 @@ For later releases, pull the intended Git revision, build the `migrate`, `api`, 
 ## Possible next steps
 
 - Add authentication and per-user shelves before opening the app to multiple users.
-- Add CI to run typecheck, lint, builds, automated tests, and a staging deployment on each change.
+- Add CI to run typecheck, lint, builds, API tests, and a staging deployment on each change.
 - Schedule certificate renewal and encrypted off-site database backups, with tested restore procedures.
 - Add monitoring and alerting for API errors, database health, and Open Library failures; consider caching catalog responses to reduce dependence on upstream availability.
